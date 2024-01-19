@@ -34,6 +34,13 @@ function addOrSaveRow() {
     const data = { name, company, place };
 
     validateData(name, company, place);
+    
+    
+
+      var entries = JSON.parse(localStorage.getItem("entries")) || [];
+      entries.push({ name: name, company: company, place: place });
+      localStorage.setItem("entries", JSON.stringify(entries));
+    
     clearInputs();
 
     if (state.isEdit) {
@@ -55,18 +62,29 @@ function addOrSaveRow() {
   }
 }
 
+
 function mySearch() {
   var input = document.getElementById("myInput");
-  var text = input.value;
+  var text = input.value.toLowerCase();
 
-  state.searchResults = state.allRecords.filter((item) =>
-    JSON.stringify(item).includes(text)
-  );
+  state.searchResults = state.allRecords.filter((item) => {
+    for (const key in item) {
+      if (item.hasOwnProperty(key) && typeof item[key] === 'string') {
+        if (item[key].toLowerCase().includes(text)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  });
+
   if (state.searchResults.length === 0) {
     state.searchResults = [...state.allRecords];
   }
+  
   renderTable(false);
 }
+
 
 function renderRow(item = {}, index) {
   let table = document.getElementById("tbody");
@@ -122,3 +140,4 @@ function deleteRow(indexToRemove) {
 }
 
 renderTable();
+
